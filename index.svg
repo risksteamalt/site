@@ -1,0 +1,931 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <foreignObject width="100%" height="100%">
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4chan-style catalog clone</title>
+  <style><![CDATA[
+    :root{
+      --bg: #f2f2f2;
+      --panel: #e7e7e7;
+      --input: #ffffff;
+      --card: #ffffff;
+      --border: #d0d0d0;
+      --text: #111111;
+      --muted: #666666;
+      --accent: #0064a8;
+      --accent-soft: #dfeffc;
+      --green: #1b7a49;
+      --quote: #eaeaea;
+      --danger: #a52424;
+      --shadow: rgba(0,0,0,0.08);
+      --button: #0a69b7;
+      --button-text: #ffffff;
+      --reply-bg: #fafafa;
+      --post-bg: #f9f9f9;
+      --thread-hover: #f7f7f7;
+    }
+
+    body.dark{
+      --bg: #0d0d0d;
+      --panel: #141414;
+      --input: #1a1a1a;
+      --card: #171717;
+      --border: #2b2b2b;
+      --text: #f0f0f0;
+      --muted: #a0a0a0;
+      --accent: #7ab8ff;
+      --accent-soft: #1f3348;
+      --green: #7be0a1;
+      --quote: #202020;
+      --danger: #ff8d8d;
+      --shadow: rgba(0,0,0,0.35);
+      --button: #3b82f6;
+      --button-text: #ffffff;
+      --reply-bg: #171717;
+      --post-bg: #121212;
+      --thread-hover: #1b1b1b;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      padding: 18px;
+    }
+
+    .app {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      min-height: 92vh;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 24px var(--shadow);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #dfeaf6;
+    }
+
+    body.dark .topbar {
+      background: #101b2a;
+    }
+
+    .brand {
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: 1.35rem;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status {
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--button);
+      color: var(--button-text);
+      font-weight: 700;
+      padding: 9px 12px;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      min-height: calc(100vh - 68px);
+    }
+
+    .sidebar {
+      background: rgba(0,0,0,0.01);
+      border-right: 1px solid var(--border);
+      padding: 12px 10px;
+    }
+
+    .board-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .board-btn {
+      width: 100%;
+      text-align: left;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .board-btn:hover {
+      background: var(--thread-hover);
+    }
+
+    .board-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .board-btn .board-name {
+      display: block;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: .95rem;
+      margin-bottom: 3px;
+    }
+
+    .board-btn .board-desc {
+      display: block;
+      font-size: .76rem;
+      color: var(--muted);
+    }
+
+    .add-board {
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"], input[type="file"], textarea {
+      width: 100%;
+      background: var(--input);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 10px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .main {
+      padding: 16px;
+    }
+
+    .board-header {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+
+    .board-header h2 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 1.2rem;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(0,0,0,0.05);
+      font-weight: 700;
+      font-size: .8rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .board-info {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 9px;
+      font-size: .8rem;
+    }
+
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .thread-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform .1s ease, border-color .15s ease;
+    }
+
+    .thread-card:hover {
+      border-color: #9a9a9a;
+      transform: translateY(-1px);
+    }
+
+    .thread-card .meta {
+      display: flex;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .8rem;
+      flex-wrap: wrap;
+    }
+
+    .thread-card .subject {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .thread-card .preview {
+      color: var(--text);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .thread-card .stats {
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .thread-card .open {
+      align-self: flex-start;
+      margin-top: 4px;
+    }
+
+    .compose {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .compose h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .thread-view {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 12px;
+    }
+
+    .back-btn {
+      margin-bottom: 12px;
+    }
+
+    .posts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .post {
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      background: var(--post-bg);
+      border: 1px solid var(--border);
+      align-items: flex-start;
+    }
+
+    .post.op {
+      background: var(--card);
+    }
+
+    .post-no {
+      min-width: 42px;
+      font-weight: 700;
+      color: var(--muted);
+      padding-top: 3px;
+    }
+
+    .post-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .post-head {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .8rem;
+      margin-bottom: 8px;
+    }
+
+    .post-author {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .post-subject {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .post-text {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .post-image {
+      display: block;
+      max-width: 240px;
+      max-height: 240px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: #efefef;
+      margin-bottom: 8px;
+    }
+
+    .reply-box {
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 12px;
+    }
+
+    .reply-box h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .quote {
+      display: inline-block;
+      background: var(--quote);
+      border-left: 3px solid #9a9a9a;
+      padding: 3px 7px;
+      margin: 4px 0;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 900px){
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .post {
+        flex-direction: column;
+      }
+      .post-no {
+        min-width: auto;
+      }
+    }
+  ]]></style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">/chan/</div>
+      <div class="topbar-right">
+        <div class="status">single-file catalog clone</div>
+        <button id="themeToggle" type="button" class="secondary">Dark mode</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div id="boardList" class="board-list"></div>
+
+        <div class="add-board">
+          <div class="field">
+            <label for="newBoardInput">Add board</label>
+            <input id="newBoardInput" type="text" maxlength="12" placeholder="e.g. tech" />
+          </div>
+          <button id="newBoardBtn" type="button" class="secondary">Create Board</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div id="mainContent"></div>
+      </main>
+    </div>
+  </div>
+
+  <script><![CDATA[
+    const STORAGE_KEY = 'chanlite_catalog_dark_v1';
+
+    function generateId(prefix) {
+      return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+    }
+
+    function createDefaultState() {
+      const boards = [
+        {
+          id: 'g',
+          name: '/g/',
+          description: 'Technology',
+          threads: [
+            {
+              id: 'g-thread-1',
+              subject: 'Why build a 4chan clone in one file?',
+              createdAt: new Date().toISOString(),
+              posts: [
+                {
+                  id: 'g-post-1',
+                  no: 1,
+                  author: 'RISKS OWNER',
+                  subject: 'Why build a 4chan clone in one file?',
+                  text: 'Because it is fun and useful for prototypes. You can fake the whole UI in a browser without a backend.',
+                  image: '',
+                  createdAt: new Date().toISOString()
+                },
+                {
+                  id: 'g-post-2',
+                  no: 2,
+                  author: 'Anonymous',
+                  subject: '',
+                  text: 'It works for demos, prototypes, or mockups. Real email/auth still needs a server.',
+                  image: '',
+                  createdAt: new Date().toISOString()
+                },
+                {
+                  id: 'g-post-3',
+                  no: 3,
+                  author: 'Anonymous',
+                  subject: '',
+                  text: '>>1\nThis is how quote replies work in the UI.',
+                  image: '',
+                  createdAt: new Date().toISOString()
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'b',
+          name: '/b/',
+          description: 'Random',
+          threads: []
+        },
+        {
+          id: 'pol',
+          name: '/pol/',
+          description: 'Politics',
+          threads: []
+        },
+        {
+          id: 'a',
+          name: '/a/',
+          description: 'Anime',
+          threads: []
+        }
+      ];
+
+      return {
+        activeBoardId: 'g',
+        activeThreadId: null,
+        darkMode: false,
+        boards
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return createDefaultState();
+
+        const parsed = JSON.parse(raw);
+        if (!parsed || !Array.isArray(parsed.boards)) return createDefaultState();
+
+        parsed.boards = parsed.boards.map(board => ({
+          id: board.id || generateId('board'),
+          name: board.name || `/${String(board.id || 'board').replace(/[^a-z0-9]/gi, '').toLowerCase()}/`,
+          description: board.description || 'Custom board',
+          threads: Array.isArray(board.threads) ? board.threads : []
+        }));
+
+        if (!parsed.activeBoardId || !parsed.boards.some(b => b.id === parsed.activeBoardId)) {
+          parsed.activeBoardId = parsed.boards[0].id;
+        }
+
+        return parsed;
+      } catch {
+        return createDefaultState();
+      }
+    }
+
+    let state = loadState();
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function getBoard(boardId) {
+      return state.boards.find(board => board.id === boardId) || state.boards[0];
+    }
+
+    function getThread(boardId, threadId) {
+      const board = getBoard(boardId);
+      return board.threads.find(thread => thread.id === threadId);
+    }
+
+    function escapeHtml(str='') {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatTime(iso) {
+      if (!iso) return 'just now';
+      const diff = Date.now() - new Date(iso).getTime();
+      const sec = Math.max(1, Math.floor(diff / 1000));
+      if (sec < 60) return `${sec}s ago`;
+      const min = Math.floor(sec / 60);
+      if (min < 60) return `${min}m ago`;
+      const hours = Math.floor(min / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      return `${days}d ago`;
+    }
+
+    function renderBoardList() {
+      const boardList = document.getElementById('boardList');
+      boardList.innerHTML = '';
+
+      state.boards.forEach(board => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'board-btn' + (state.activeBoardId === board.id ? ' active' : '');
+        btn.innerHTML = `
+          <span class="board-name">${escapeHtml(board.name)}</span>
+          <span class="board-desc">${escapeHtml(board.description)}</span>
+        `;
+        btn.addEventListener('click', () => {
+          state.activeBoardId = board.id;
+          state.activeThreadId = null;
+          render();
+        });
+        boardList.appendChild(btn);
+      });
+    }
+
+    function renderRichText(text = '') {
+      const escaped = escapeHtml(text).replace(/\\n/g, '<br>');
+      return escaped.replace(/(>>\\d+)/g, '<span class=\"quote\" data-quote=\"$1\">$1</span>');
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderBoardView() {
+      const board = getBoard(state.activeBoardId);
+      const totalPosts = board.threads.reduce((sum, t) => sum + t.posts.length, 0);
+
+      document.getElementById('mainContent').innerHTML = `
+        <div class="board-header">
+          <h2>
+            <span class="tag">${escapeHtml(board.name)}</span>
+            <span>${escapeHtml(board.description)}</span>
+          </h2>
+          <div class="board-info">${board.threads.length} threads • ${totalPosts} posts</div>
+        </div>
+
+        <div class="toolbar">
+          <span class="pill">Anonymous</span>
+          <span class="pill">${board.threads.length} threads</span>
+          <span class="pill">${totalPosts} posts</span>
+        </div>
+
+        <form id="newThreadForm" class="compose">
+          <h3>Start a new thread</h3>
+          <div class="grid">
+            <div class="field">
+              <label for="threadSubject">Subject</label>
+              <input id="threadSubject" type="text" placeholder="Thread subject" />
+            </div>
+            <div class="field">
+              <label for="threadAuthor">Name</label>
+              <input id="threadAuthor" type="text" value="Anonymous" />
+            </div>
+            <div class="field full">
+              <label for="threadText">Comment</label>
+              <textarea id="threadText" placeholder="Write something..." required></textarea>
+            </div>
+            <div class="field full">
+              <label for="threadImage">Image (optional)</label>
+              <input id="threadImage" type="file" accept="image/*" />
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; margin-top: 10px;">
+            <button type="submit">Create Thread</button>
+          </div>
+        </form>
+
+        <div class="catalog">
+          ${board.threads.length === 0 ? `
+            <div class="thread-card">
+              <div class="subject">No threads yet</div>
+              <div class="preview">This board is empty. Start the first thread.</div>
+            </div>
+          ` : board.threads.map(thread => {
+            const op = thread.posts[0];
+            const preview = (op && op.text ? op.text : '').slice(0, 220);
+            const replies = Math.max(0, thread.posts.length - 1);
+
+            return `
+              <div class="thread-card">
+                <div class="meta">
+                  <span>${escapeHtml(op ? op.author : 'Anonymous')}</span>
+                  <span>•</span>
+                  <span>${formatTime(op ? op.createdAt : new Date().toISOString())}</span>
+                </div>
+
+                <div class="subject">${escapeHtml(thread.subject || 'No subject')}</div>
+                <div class="preview">${escapeHtml(preview || 'No text')}</div>
+                <div class="stats">${thread.posts.length} posts • ${replies} replies</div>
+
+                <button type="button" class="secondary open" data-thread-open="${thread.id}">Open Thread</button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      document.getElementById('newThreadForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const subject = document.getElementById('threadSubject').value.trim() || 'No subject';
+        const author = document.getElementById('threadAuthor').value.trim() || 'Anonymous';
+        const text = document.getElementById('threadText').value.trim();
+        const fileInput = document.getElementById('threadImage');
+        const image = fileInput && fileInput.files && fileInput.files[0] ? await fileToDataUrl(fileInput.files[0]) : '';
+
+        if (!text) return;
+
+        const board = getBoard(state.activeBoardId);
+        board.threads.unshift({
+          id: generateId('thread'),
+          subject,
+          createdAt: new Date().toISOString(),
+          posts: [{
+            id: generateId('post'),
+            no: 1,
+            author,
+            subject,
+            text,
+            image,
+            createdAt: new Date().toISOString()
+          }]
+        });
+
+        saveState();
+        render();
+      });
+
+      document.querySelectorAll('[data-thread-open]').forEach(button => {
+        button.addEventListener('click', () => {
+          state.activeThreadId = button.getAttribute('data-thread-open');
+          render();
+        });
+      });
+    }
+
+    function renderThreadView() {
+      const thread = getThread(state.activeBoardId, state.activeThreadId);
+
+      if (!thread) {
+        state.activeThreadId = null;
+        render();
+        return;
+      }
+
+      const postsHtml = thread.posts.map(post => `
+        <div class="post ${post.no === 1 ? 'op' : ''}">
+          <div class="post-no">#${post.no}</div>
+          <div class="post-body">
+            <div class="post-head">
+              <span class="post-subject">${escapeHtml(post.subject || '')}</span>
+              <span class="post-author">${escapeHtml(post.author || 'Anonymous')}</span>
+              <span>${formatTime(post.createdAt)}</span>
+            </div>
+
+            ${post.image ? `<img class="post-image" src="${post.image}" alt="uploaded image" />` : ''}
+
+            <div class="post-text">${renderRichText(post.text || '')}</div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('mainContent').innerHTML = `
+        <div class="thread-view">
+          <button type="button" class="secondary back-btn" id="backBtn">← Back to board</button>
+
+          <div class="posts">
+            ${postsHtml}
+          </div>
+
+          <div class="reply-box">
+            <h3>Reply to thread</h3>
+            <form id="replyForm">
+              <div class="grid">
+                <div class="field">
+                  <label for="replyName">Name</label>
+                  <input id="replyName" type="text" value="Anonymous" />
+                </div>
+
+                <div class="field">
+                  <label for="replyImage">Image (optional)</label>
+                  <input id="replyImage" type="file" accept="image/*" />
+                </div>
+
+                <div class="field full">
+                  <label for="replyText">Comment</label>
+                  <textarea id="replyText" placeholder="Write a reply..." required></textarea>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+                <button type="submit">Post Reply</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('backBtn').addEventListener('click', () => {
+        state.activeThreadId = null;
+        render();
+      });
+
+      document.getElementById('replyForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const text = document.getElementById('replyText').value.trim();
+        if (!text) return;
+
+        const author = document.getElementById('replyName').value.trim() || 'Anonymous';
+        const fileInput = document.getElementById('replyImage');
+        const image = fileInput && fileInput.files && fileInput.files[0] ? await fileToDataUrl(fileInput.files[0]) : '';
+
+        const thread = getThread(state.activeBoardId, state.activeThreadId);
+        thread.posts.push({
+          id: generateId('post'),
+          no: thread.posts.length + 1,
+          author,
+          subject: '',
+          text,
+          image,
+          createdAt: new Date().toISOString()
+        });
+
+        saveState();
+        render();
+      });
+
+      document.querySelectorAll('.quote').forEach(node => {
+        node.addEventListener('click', () => {
+          const quote = node.getAttribute('data-quote');
+          const textarea = document.getElementById('replyText');
+          textarea.value = textarea.value.trim() ? `${textarea.value.trim()}\\n${quote}\\n` : `${quote}\\n`;
+          textarea.focus();
+        });
+      });
+    }
+
+    function render() {
+      renderBoardList();
+
+      if (state.activeThreadId) {
+        renderThreadView();
+      } else {
+        renderBoardView();
+      }
+
+      document.body.classList.toggle('dark', !!state.darkMode);
+      const button = document.getElementById('themeToggle');
+      button.textContent = state.darkMode ? 'Light mode' : 'Dark mode';
+      saveState();
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      state.darkMode = !state.darkMode;
+      render();
+    });
+
+    document.getElementById('newBoardBtn').addEventListener('click', () => {
+      const input = document.getElementById('newBoardInput');
+      const raw = (input.value || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      const id = raw.slice(0, 12);
+
+      if (!id) return;
+
+      const exists = state.boards.some(board => board.id === id);
+      if (exists) {
+        state.activeBoardId = id;
+        state.activeThreadId = null;
+        input.value = '';
+        render();
+        return;
+      }
+
+      state.boards.push({
+        id,
+        name: `/${id}/`,
+        description: 'Custom board',
+        threads: []
+      });
+
+      state.activeBoardId = id;
+      state.activeThreadId = null;
+      input.value = '';
+      saveState();
+      render();
+    });
+
+    render();
+  ]]></script>
+</body>
+    </html>
+  </foreignObject>
+</svg>
